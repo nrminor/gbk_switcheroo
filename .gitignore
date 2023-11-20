@@ -172,3 +172,5 @@ data/
 dev/
 scratch/
 sandbox/
+*.tsv
+*.gbk

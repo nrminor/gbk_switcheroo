@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 
+"""
+Example usage:
+
+```
+gbk_switcheroo \
+--key_file /path/to/key_file.tsv \
+--key_col 1 \
+--val_col 2 \
+--feature "ACCESSION" \
+--gbk_file /path/to/input.gbk
+```
+"""
+
 
 import sys
 import argparse
+import re
 from typing import Tuple
 from result import Result, Ok, Err  # type: ignore
 import polars as pl
@@ -70,16 +84,32 @@ def gbk_switcheroo(gbk_file: str, key_dict: dict, feature: str) -> Result[None, 
         - `feature: str`: A string specifying the feature to replace, e.g.,
         "ACCESSION"
     """
-    with open(gbk_file, "r", encoding="utf-8") as input, open(
+    with open(gbk_file, "r", encoding="utf-8") as input_gbk, open(
         "replacement.gbk", "w", encoding="utf-8"
     ) as output:
-        for line in input:
+        for line in input_gbk:
             if not line.startswith(feature):
                 output.write(line)
                 continue
-            elements = line.split()
-            replacement = key_dict.get(elements[1])
-            output.write(f"{elements[0]}   {replacement}")
+
+            # pull out the mon-space elements, returning an error string if there are
+            # none
+            elements = re.split(" ", line.rstrip())
+            if len(elements) == 0:
+                return Err("Requested feature not found in provided genbank file.")
+
+            # determine which element needs to be replaced and get that item with
+            # the key dictionary
+            old_strings = list(key_dict.keys())
+            replace_index, = [
+                i for i, item in enumerate(elements) if item in old_strings
+            ]  # zero-based
+            replacement = str(key_dict.get(elements[replace_index]))
+
+            # construct the new line and write it
+            elements[replace_index] = replacement
+            newline = " ".join(elements)
+            output.write(f"{newline}\n")
 
     return Ok(None)
 
@@ -97,15 +127,13 @@ def main() -> None:
         )
     key_file, key_col, val_col, feature, gbk_file = args_result.unwrap()
 
-    # read the key file
-    key_dicts = (
-        pl.read_csv(key_file, separator="\t", has_header=True)
-        .select([key_col, val_col])
-        .to_dicts()
-    )
-
     # create dictionary of query and replacement strings
-    key_dict = {old_string: replacement for old_string, replacement in key_dicts}
+    key_dict = {
+        key: value
+        for key, value in pl.read_csv(key_file, separator="\t", has_header=False)[
+            :, [key_col, val_col]
+        ].iter_rows()
+    }
 
     # feed the key dictionary into a function that will read, modify, and write
     # the new genbank file
