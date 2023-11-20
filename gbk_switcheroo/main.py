@@ -59,10 +59,10 @@ def parse_command_line_args() -> Result[Tuple[str, int, int, str, str], str]:
 
 def gbk_switcheroo(gbk_file: str, key_dict: dict, feature: str) -> Result[None, str]:
     """
-        Function `gbk_switcheroo()` goes through each line in the input, finds the 
+        Function `gbk_switcheroo()` goes through each line in the input, finds the
         feature that should be replaced, replaces it, and then writes it to a new
         output Genbank file. Minimal parsing is performed.
-    
+
     args:
         - `gbk_file: str`: A string specifying the path to the genbank file.
         - `key_dict: dict`: A dictionary of the old strings and the new strings
