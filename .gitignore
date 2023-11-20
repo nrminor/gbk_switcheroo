@@ -162,3 +162,13 @@ cython_debug/
 # MacOS files
 ._*
 .DS_Store
+
+# project data and development directories
+input/
+seqs/
+gbks/
+genbanks/
+data/
+dev/
+scratch/
+sandbox/
