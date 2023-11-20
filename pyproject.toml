@@ -5,14 +5,8 @@ description = ""
 authors = ["Nicholas Minor <nrminor@wisc.edu>"]
 readme = "README.md"
 
-[project.scripts]
+[tool.poetry.scripts]
 "gbk_switcheroo" = "gbk_switcheroo.main:main"
-
-[project]
-name = "gbk_switcheroo"
-description = ""
-readme = "README.md"
-version = "0.1.0"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -20,6 +14,8 @@ result = "^0.14.0"
 ruff = "^0.1.6"
 pdoc = "^14.1.0"
 blackdoc = "^0.3.9"
+polars = "^0.19.15"
+strictyaml = "^1.7.3"
 
 
 [build-system]

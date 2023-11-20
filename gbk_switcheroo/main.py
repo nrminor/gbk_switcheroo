@@ -13,7 +13,7 @@ def parse_command_line_args() -> Result[Tuple[str, int, int, str, str], str]:
     Parses command line arguments.
 
     Returns:
-        Result[argparse.Namespace, str]: Returns Ok(argparse.Namespace) if args could
+        Result[Tuple, str]: Returns Ok(Tuple) if args could
         be parsed, else returns Err(str).
     """
     parser = argparse.ArgumentParser()
@@ -58,6 +58,18 @@ def parse_command_line_args() -> Result[Tuple[str, int, int, str, str], str]:
 
 
 def gbk_switcheroo(gbk_file: str, key_dict: dict, feature: str) -> Result[None, str]:
+    """
+        Function `gbk_switcheroo()` goes through each line in the input, finds the 
+        feature that should be replaced, replaces it, and then writes it to a new
+        output Genbank file. Minimal parsing is performed.
+    
+    args:
+        - `gbk_file: str`: A string specifying the path to the genbank file.
+        - `key_dict: dict`: A dictionary of the old strings and the new strings
+        you intend to replace them with.
+        - `feature: str`: A string specifying the feature to replace, e.g.,
+        "ACCESSION"
+    """
     with open(gbk_file, "r", encoding="utf-8") as input, open(
         "replacement.gbk", "w", encoding="utf-8"
     ) as output:
